@@ -1,2 +1,111 @@
-# CCE-2-UNIT-3
-Undo / Redo Engine 
+#include <iostream>
+#include <stack>
+#include <string>
+using namespace std;
+
+class UndoRedo
+{
+    stack<string> undoStack;
+    stack<string> redoStack;
+    string text;
+
+public:
+
+    UndoRedo()
+    {
+        text = "";
+    }
+
+    void insertText(string newText)
+    {
+        undoStack.push(text);
+        text = text + newText;
+
+        while (!redoStack.empty())
+        {
+            redoStack.pop();
+        }
+    }
+
+    void undo()
+    {
+        if (undoStack.empty())
+        {
+            cout << "Nothing to undo!" << endl;
+            return;
+        }
+
+        redoStack.push(text);
+        text = undoStack.top();
+        undoStack.pop();
+    }
+
+    void redo()
+    {
+        if (redoStack.empty())
+        {
+            cout << "Nothing to redo!" << endl;
+            return;
+        }
+
+        undoStack.push(text);
+        text = redoStack.top();
+        redoStack.pop();
+    }
+
+    void display()
+    {
+        cout << "Text: " << text << endl;
+    }
+};
+
+int main()
+{
+    UndoRedo editor;
+    int choice;
+    string data;
+
+    do
+    {
+        cout << "\n--- Undo/Redo Engine ---" << endl;
+        cout << "1. Insert Text" << endl;
+        cout << "2. Undo" << endl;
+        cout << "3. Redo" << endl;
+        cout << "4. Display Text" << endl;
+        cout << "5. Exit" << endl;
+
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter text: ";
+            cin >> data;
+            editor.insertText(data);
+            break;
+
+        case 2:
+            editor.undo();
+            break;
+
+        case 3:
+            editor.redo();
+            break;
+
+        case 4:
+            editor.display();
+            break;
+
+        case 5:
+            cout << "Program ended." << endl;
+            break;
+
+        default:
+            cout << "Invalid choice!" << endl;
+        }
+
+    } while (choice != 5);
+
+    return 0;
+}
