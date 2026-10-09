@@ -1,0 +1,154 @@
+Undo/Redo Engine Using Stack in C++
+
+1. Problem Statement
+To implement an Undo/Redo Engine using the Stack data structure in C++. The program allows users to insert text, undo the last operation, redo an undone operation, and display the current text.
+
+2. Objective
+To understand the Stack data structure and its LIFO principle.
+To implement Undo and Redo operations using two stacks.
+To manage text modifications efficiently.
+To understand the practical application of stacks in text editors.
+
+3. Data Structures Used
+Stack: A stack follows the Last In, First Out (LIFO) principle.
+Two stacks are used:
+Undo Stack: Stores previous text states to support Undo operations.
+Redo Stack: Stores undone text states to support Redo operations.
+A string variable stores the current text.
+
+4. Algorithm
+Start the program.
+Initialize two empty stacks, undoStack and redoStack, and an empty string text.
+Display the menu containing Insert Text, Undo, Redo, Display Text, and Exit.
+Accept the user's choice.
+If the user selects Insert Text:
+Push the current text into undoStack.
+Append the new text to the current text.
+Clear redoStack.
+If the user selects Undo:
+Check whether undoStack is empty.
+If empty, display "Nothing to undo!"
+Otherwise, push the current text into redoStack, restore the previous text, and remove that state from undoStack.
+If the user selects Redo:
+Check whether redoStack is empty.
+If empty, display "Nothing to redo!"
+Otherwise, push the current text into undoStack, restore the text from redoStack, and remove that state from redoStack.
+If the user selects Display Text, display the current text.
+If the user selects Exit, terminate the program.
+If the user enters an invalid choice, display an appropriate message.
+Repeat the menu until the user selects Exit.
+Stop the program.
+
+5. Explanation
+The Undo/Redo Engine uses two stacks to maintain the history of text modifications.
+When new text is inserted, the current text is stored in the undo stack before modification. During an Undo operation, the current text is saved in the redo stack, and the previous text is restored.
+During a Redo operation, the current text is saved in the undo stack, and the previously undone text is restored.
+Whenever a new text insertion occurs, the redo stack is cleared because the previous redo history is no longer valid.
+The program uses a menu-driven approach so that users can perform different operations interactively.
+
+6. Sample Input
+1
+Hello
+1
+World
+4
+2
+4
+3
+4
+5
+
+7. Sample Output
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 1
+Enter text: Hello
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 1
+Enter text: World
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 4
+Text: HelloWorld
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 2
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 4
+Text: Hello
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 3
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 4
+Text: HelloWorld
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 5
+Program ended. 
+
+8. Time Complexity
+Operation
+Time Complexity
+Insert Text
+O(n)
+Undo
+O(n)
+Redo
+O(n)
+Display Text
+O(n)
+
+Here, n represents the length of the text being stored or displayed. Clearing the redo stack may also take additional time depending on the number of stored states.
+
+9. Applications
+Text editors such as Notepad.
+Undo and Redo functionality in document applications.
+Drawing and graphics applications.
+Editing tools and software.
+History management in applications.
+
+10. Conclusion
+The Undo/Redo Engine was implemented successfully using the Stack data structure in C++. The program demonstrates how two stacks can maintain previous and undone text states to perform Undo and Redo operations. This assignment helped in understanding the practical application of the LIFO principle in history management.
