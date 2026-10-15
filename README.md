@@ -1,0 +1,243 @@
+# Undo/Redo Engine Using Linked-List Stack in C++
+
+![Language](https://img.shields.io/badge/Language-C%2B%2B-00599C?style=flat-square&logo=c%2B%2B)
+![IDE](https://img.shields.io/badge/IDE-Dev--C%2B%2B-blue?style=flat-square)
+![Data Structure](https://img.shields.io/badge/Data_Structure-Linked_List_Stack-success?style=flat-square)
+![Interface](https://img.shields.io/badge/Interface-CLI_Menu-informational?style=flat-square)
+
+---
+
+## 1. Problem Statement
+To design and implement an interactive **Undo/Redo Engine** in C++ using a **Stack Abstract Data Type (ADT) implemented via a Singly Linked List**. The engine allows users to dynamically insert text, undo the most recent modification, redo a previously undone action, and inspect the active buffer state in real time.
+
+---
+
+## 2. Objectives
+* To understand the **Stack** data structure and its **Last In, First Out (LIFO)** operating principle.
+* To implement a dynamic, pointer-based Stack from scratch using a **Singly Linked List** (`Node` allocation and deallocation) without relying on fixed-size arrays or STL containers.
+* To coordinate state transitions between two separate stacks (`undoStack` and `redoStack`) for history management.
+* To demonstrate the practical application of linked stacks in text editors and document processing software.
+
+---
+
+## 3. Data Structures & Architecture
+
+### 3.1 Singly Linked List Node (`struct Node`)
+Each historical state of the text buffer is stored inside a dynamically allocated node containing:
+* `string data`: Stores the snapshot of the text string at that state.
+* `Node* next`: Pointer referencing the previous state node below it in the stack.
+
+### 3.2 Custom Stack Class (`class Stack`)
+Follows the **LIFO (Last In, First Out)** principle by performing all insertions (`push`) and deletions (`pop`) strictly at the head (`topNode`) of the singly linked list in $O(1)$ pointer manipulation time.
+
+```text
+topNode
+  │
+  ▼
+┌──────────────┬──────┐    ┌──────────────┬──────┐    ┌──────────────┬──────┐
+│ "HelloWorld" │ next ├───►│   "Hello"    │ next ├───►│      ""      │ NULL │
+└──────────────┴──────┘    └──────────────┴──────┘    └──────────────┴──────┘
+   (Most Recent State)         (Previous State)            (Initial State)
+```
+
+### 3.3 Dual-Stack State Management (`class UndoRedo`)
+* **`undoStack`**: Linked-list stack that stores previous text snapshots prior to every new modification.
+* **`redoStack`**: Linked-list stack that stores text snapshots popped during an Undo operation so they can be restored if requested.
+* **`text` (`std::string`)**: Holds the currently active text state in the editor.
+
+---
+
+## 4. Algorithm
+
+### Stack Operations (Linked List Implementation)
+1. **`push(val)`**:
+   * Dynamically allocate a `newNode` with `data = val`.
+   * Set `newNode->next = topNode`.
+   * Update `topNode = newNode`.
+2. **`pop()`**:
+   * Verify the stack is not empty (`topNode != NULL`).
+   * Store `topNode` in a temporary pointer `temp`.
+   * Advance `topNode = topNode->next`.
+   * Free memory using `delete temp`.
+3. **`top()`**:
+   * Return `topNode->data` if `topNode != NULL`.
+
+### Engine Workflow
+1. **Start** the program and initialize two empty linked-list stacks (`undoStack` and `redoStack`, where `topNode = NULL`) and an empty string `text = ""`.
+2. **Display** the interactive menu:
+   * `1. Insert Text`
+   * `2. Undo`
+   * `3. Redo`
+   * `4. Display Text`
+   * `5. Exit`
+3. **Accept** the user's menu choice:
+   * **Case 1 (Insert Text)**:
+     1. Push the current `text` state onto `undoStack`.
+     2. Append `newText` to `text`.
+     3. Clear `redoStack` by popping and deleting all nodes until `redoStack.empty()` is true.
+   * **Case 2 (Undo)**:
+     1. Check if `undoStack.empty()` is true. If empty, display `"Nothing to undo!"`.
+     2. Otherwise, push the current `text` onto `redoStack`, assign `text = undoStack.top()`, and call `undoStack.pop()`.
+   * **Case 3 (Redo)**:
+     1. Check if `redoStack.empty()` is true. If empty, display `"Nothing to redo!"`.
+     2. Otherwise, push the current `text` onto `undoStack`, assign `text = redoStack.top()`, and call `redoStack.pop()`.
+   * **Case 4 (Display Text)**:
+     1. Print the active string buffer in the format `Text: <current_text>`.
+   * **Case 5 (Exit)**:
+     1. Print `"Program ended."` and terminate the loop (destructors automatically deallocate any remaining nodes).
+   * **Default**:
+     1. Display `"Invalid choice!"`.
+4. **Repeat** Step 2 and Step 3 until the user selects `5 (Exit)`.
+5. **Stop** the program.
+
+---
+
+## 5. Working Explanation
+The Undo/Redo Engine maintains a complete timeline of text edits using two pointer-based stacks:
+* **On Text Insertion**: Before modifying the active string, the current state is pushed as a new node onto `undoStack`. Because branching into a new edit invalidates any previously undone future states, `redoStack` is completely flushed.
+* **On Undo**: The current text is pushed onto `redoStack`, and the most recent historical snapshot at the head of `undoStack` is restored and popped.
+* **On Redo**: The current text is pushed back onto `undoStack`, and the state at the head of `redoStack` is restored and popped.
+
+---
+
+## 6. Build & Execution Instructions
+
+### Method 1: Using Dev-C++ IDE (Recommended for Lab Evaluation)
+This program is written using legacy-compatible C++ syntax (`NULL` pointers and standard headers) so it compiles out-of-the-box on **Dev-C++ (5.11 / Embarcadero)** without requiring any additional compiler flags.
+
+1. **Open the Source File**:
+   * Launch **Dev-C++**.
+   * Click **File** -> **Open** (or press `Ctrl + O`) and select `Redo Engine.cpp`.
+   *(Alternatively, create a new source file via `Ctrl + N`, paste the code, and save it as `UndoRedo.cpp`)*.
+2. **Compile the Program**:
+   * Go to the top menu bar and select **Execute** -> **Compile** (or press **`F9`**).
+   * Verify that the **Compile Log** at the bottom reports `0 Errors, 0 Warnings`.
+3. **Run the Program**:
+   * Select **Execute** -> **Run** (or press **`F10`**) to launch the console window.
+   * **Quick Shortcut**: Press **`F11`** (**Execute** -> **Compile & Run**) to compile and launch the output window in a single step.
+
+### Method 2: Using Command Line (MinGW / G++)
+If compiling directly via the Windows Command Prompt or terminal:
+```bash
+g++ "Redo Engine.cpp" -o UndoRedo.exe
+UndoRedo.exe
+```
+
+---
+
+## 7. Verification & Sample Execution
+
+### Sample Input Sequence
+```text
+1
+Hello
+1
+World
+4
+2
+4
+3
+4
+5
+```
+
+### Sample Console Output
+```text
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 1
+Enter text: Hello
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 1
+Enter text: World
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 4
+Text: HelloWorld
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 2
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 4
+Text: Hello
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 3
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 4
+Text: HelloWorld
+
+--- Undo/Redo Engine ---
+1. Insert Text
+2. Undo
+3. Redo
+4. Display Text
+5. Exit
+Enter your choice: 5
+Program ended.
+```
+
+---
+
+## 8. Complexity Analysis
+
+| Operation | Pointer Manipulation | Overall Time Complexity | Notes |
+| :--- | :---: | :---: | :--- |
+| **Insert Text** | $O(1)$ | $O(n + k)$ | $O(n)$ for string copying/concatenation; $O(k)$ to clear $k$ nodes in `redoStack` |
+| **Undo** | $O(1)$ | $O(n)$ | Head node insertion/deletion is $O(1)$; string assignment takes $O(n)$ |
+| **Redo** | $O(1)$ | $O(n)$ | Head node insertion/deletion is $O(1)$; string assignment takes $O(n)$ |
+| **Display Text** | — | $O(n)$ | Prints string of length $n$ to standard output |
+
+*Where $n$ represents the length of the text string being stored or displayed, and $k$ represents the number of undone states cleared from `redoStack`.*
+
+* **Space Complexity**: $O(m \times n)$, where $m$ is the total number of state nodes dynamically allocated across `undoStack` and `redoStack`, and $n$ is the average length of the stored text snapshot.
+
+---
+
+## 9. Real-World Applications
+* **Text Editors & Word Processors**: Notepad, Microsoft Word, and code editors (VS Code) for reversing or reapplying typing actions.
+* **Graphics & UI Design Tools**: Layer and vector action history in tools like Figma, Photoshop, and CAD software.
+* **Database Transaction Logs**: Rollback (Undo) and roll-forward (Redo) recovery mechanisms.
+* **Browser & Navigation Systems**: Back and Forward history stack management.
+
+---
+
+## 10. Conclusion
+The Undo/Redo Engine was successfully implemented in C++ using a custom **Singly Linked List-based Stack**. By managing dynamic nodes across two stacks (`undoStack` and `redoStack`), the system handles multi-step state reversal and restoration without any fixed capacity limits or memory leaks, demonstrating the core role of the LIFO principle in real-world software engineering.
