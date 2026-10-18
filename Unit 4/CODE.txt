@@ -1,0 +1,178 @@
+#include <iostream>
+#include <string>
+#include <queue>
+#include <map>
+#include <algorithm>
+
+using namespace std;
+
+// Structure for a binary tree node
+struct Node
+ {
+    string name;
+    Node* left;
+    Node* right;
+
+    Node(string n) 
+	{
+        name = n;
+        left = NULL;
+        right = NULL;
+    }
+};
+
+// Class for the cricket tournament tree
+class Tournament
+ {
+private:
+    Node* root;
+
+    // Calculate the height of the tree
+    int height(Node* node)
+	 {
+        if (node == NULL)
+            return -1;
+
+        return 1 + max(height(node->left),
+                       height(node->right));
+    }
+
+    // Find the depth of a node by its name
+    int findDepth(Node* node, string name, int depth) 
+	{
+        if (node == NULL)
+            return -1;
+
+        if (node->name == name)
+            return depth;
+
+        int result = findDepth(node->left, name, depth + 1);
+
+        if (result != -1)
+            return result;
+
+        return findDepth(node->right, name, depth + 1);
+    }
+
+public:
+    // Build an eight-team knockout tournament
+    Tournament() 
+	{
+        Node* q1 = new Node("India vs Pakistan");
+        q1->left = new Node("India");
+        q1->right = new Node("Pakistan");
+
+        Node* q2 = new Node("Australia vs England");
+        q2->left = new Node("Australia");
+        q2->right = new Node("England");
+
+        Node* q3 = new Node("South Africa vs New Zealand");
+        q3->left = new Node("South Africa");
+        q3->right = new Node("New Zealand");
+
+        Node* q4 = new Node("Sri Lanka vs Bangladesh");
+        q4->left = new Node("Sri Lanka");
+        q4->right = new Node("Bangladesh");
+
+        Node* s1 = new Node("Semifinal 1");
+        s1->left = q1;
+        s1->right = q2;
+
+        Node* s2 = new Node("Semifinal 2");
+        s2->left = q3;
+        s2->right = q4;
+
+        root = new Node("Grand Final");
+        root->left = s1;
+        root->right = s2;
+    }
+
+    // Analyze the tournament tree
+    void analyze() 
+	{
+        int h = height(root);
+
+        map<int, int> counts;
+        queue<pair<Node*, int> > q;
+
+        q.push(make_pair(root, 0));
+
+        int total = 0;
+
+        // Count nodes at each level
+        while (!q.empty())
+		 {
+            Node* current = q.front().first;
+            int level = q.front().second;
+            q.pop();
+
+            counts[level]++;
+            total++;
+
+            if (current->left != NULL)
+                q.push(make_pair(current->left, level + 1));
+
+            if (current->right != NULL)
+                q.push(make_pair(current->right, level + 1));
+        }
+
+        // Display tree height
+        cout << "\nCRICKET TOURNAMENT TREE REPORT\n";
+        cout << "--------------------------------\n";
+        cout << "Height of Tree: " << h << "\n";
+
+        // Verify maximum nodes at each level
+        cout << "\nNodes at Each Level:\n";
+
+        for (map<int, int>::iterator it = counts.begin();
+             it != counts.end(); ++it)
+			  {
+
+            int level = it->first;
+            int actual = it->second;
+            int maximum = 1 << level;
+
+            cout << "Level " << level
+                 << ": Actual Nodes = " << actual
+                 << ", Maximum Nodes = " << maximum;
+
+            if (actual == maximum)
+                cout << " -> VERIFIED\n";
+            else
+                cout << " -> NOT MAXIMUM\n";
+        }
+
+        // Verify the total-node formula
+        int expected = (1 << (h + 1)) - 1;
+
+        cout << "\nTotal Nodes: " << total << "\n";
+        cout << "Expected Maximum Nodes: " << expected << "\n";
+
+        if (total == expected)
+            cout << "Total Nodes Formula: VERIFIED\n";
+        else
+            cout << "Total Nodes Formula: NOT VERIFIED\n";
+
+        // Find the depth of any node
+        string name;
+
+        cout << "\nEnter team or match name to find depth: ";
+        getline(cin >> ws, name);
+
+        int d = findDepth(root, name, 0);
+
+        if (d == -1)
+            cout << "Node not found!\n";
+        else
+            cout << "Depth of " << name << " = " << d << "\n";
+    }
+};
+
+// Main function
+int main()
+ {
+    Tournament tournament;
+    tournament.analyze();
+
+    return 0;
+}
